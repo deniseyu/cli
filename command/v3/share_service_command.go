@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -20,10 +21,11 @@ type ShareServiceActor interface {
 }
 
 type ShareServiceCommand struct {
-	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
-	SpaceName       flag.Space           `short:"s" description:"Space to share the service instance into"`
-	usage           interface{}          `usage:"cf share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
-	relatedCommands interface{}          `related_commands:""`
+	RequiredArgs flag.ServiceInstance `positional-args:"yes"`
+	//TODO flag.Space does not capture the command line value
+	SpaceName       string      `short:"s" description:"Space to share the service instance into"`
+	usage           interface{} `usage:"cf share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
+	relatedCommands interface{} `related_commands:""`
 
 	UI          command.UI
 	Config      command.Config
@@ -62,11 +64,13 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Sharing service instance {{.ServiceInstanceName}} into org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
 		"OrgName":             cmd.Config.TargetedOrganization().Name,
-		"SpaceName":           cmd.SpaceName.Space,
+		"SpaceName":           cmd.SpaceName,
 		"Username":            user.Name,
 	})
 
-	warnings, err := cmd.Actor.ShareServiceInstanceByOrganizationAndSpaceName(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedOrganization().GUID, cmd.SpaceName.Space)
+	fmt.Println(cmd.SpaceName)
+
+	warnings, err := cmd.Actor.ShareServiceInstanceByOrganizationAndSpaceName(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedOrganization().GUID, cmd.SpaceName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -205,6 +205,8 @@ type commandList struct {
 	UpdateSpaceQuota                   v2.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
 	UpdateUserProvidedService          v2.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
+
+	ShareService v3.ShareServiceCommand `command:"share-service" description:"Share a service instance"`
 }
 
 // HasCommand returns true if the command name is in the command list.

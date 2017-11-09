@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -69,4 +70,31 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 
 	err = client.connection.Make(request, &response)
 	return relationships, response.Warnings, err
+}
+
+func (client *Client) PostServiceInstanceSharedSpaces(serviceInstanceGUID string, spaceGUIDs []string) (RelationshipList, Warnings, error) {
+	body, err := json.Marshal(RelationshipList{GUIDs: spaceGUIDs})
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostServiceInstanceRelationshipSharedSpacesRequest,
+		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
+		Body:        bytes.NewReader(body),
+	})
+
+	fmt.Printf("%s", request.URL)
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	var relationships RelationshipList
+	response := cloudcontroller.Response{
+		Result: &relationships,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationships, response.Warnings, err
+
 }
