@@ -206,7 +206,7 @@ type commandList struct {
 	UpdateUserProvidedService          v2.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
 
-	ShareService v3.ShareServiceCommand `command:"share-service" description:"Share a service instance"`
+	V3ShareService v3.V3ShareServiceCommand `command:"v3-share-service" description:"Share a service instance with another space"`
 }
 
 // HasCommand returns true if the command name is in the command list.

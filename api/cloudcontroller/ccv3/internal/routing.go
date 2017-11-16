@@ -106,7 +106,7 @@ func NewRouter(routes []Route, resources map[string]string) *Router {
 		mappedRoutes[route.Name] = route
 	}
 	// TODO: remove this hardcoding
-	resources["service_instances"] = "https://api.services-api-thames.cf-app.com/v3/service_instances"
+	resources["service_instances"] = "https://api.services-api-pegnitz.cf-app.com/v3/service_instances"
 	return &Router{
 		routes:    mappedRoutes,
 		resources: resources,

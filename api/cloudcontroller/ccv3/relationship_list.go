@@ -3,7 +3,6 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -84,7 +83,6 @@ func (client *Client) PostServiceInstanceSharedSpaces(serviceInstanceGUID string
 		Body:        bytes.NewReader(body),
 	})
 
-	fmt.Printf("%s", request.URL)
 	if err != nil {
 		return RelationshipList{}, nil, err
 	}
@@ -96,5 +94,4 @@ func (client *Client) PostServiceInstanceSharedSpaces(serviceInstanceGUID string
 
 	err = client.connection.Make(request, &response)
 	return relationships, response.Warnings, err
-
 }

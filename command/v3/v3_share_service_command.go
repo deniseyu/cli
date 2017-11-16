@@ -1,7 +1,6 @@
 package v3
 
 import (
-	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -20,12 +19,13 @@ type ShareServiceActor interface {
 	ShareServiceInstanceByOrganizationAndSpaceName(serviceInstanceName string, orgGUID string, spaceName string) (v3action.Warnings, error)
 }
 
-type ShareServiceCommand struct {
+type V3ShareServiceCommand struct {
 	RequiredArgs flag.ServiceInstance `positional-args:"yes"`
 	//TODO flag.Space does not capture the command line value
-	SpaceName       string      `short:"s" description:"Space to share the service instance into"`
-	usage           interface{} `usage:"cf share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
-	relatedCommands interface{} `related_commands:""`
+	OrgName         string      `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
+	SpaceName       string      `short:"s" required:"true" description:"Space to share the service instance into"`
+	usage           interface{} `usage:"cf v3-share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
+	relatedCommands interface{} `related_commands:"bind-service, service, services"`
 
 	UI          command.UI
 	Config      command.Config
@@ -33,7 +33,7 @@ type ShareServiceCommand struct {
 	Actor       ShareServiceActor
 }
 
-func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *V3ShareServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -50,7 +50,10 @@ func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) erro
 	return nil
 }
 
-func (cmd ShareServiceCommand) Execute(args []string) error {
+func (cmd V3ShareServiceCommand) Execute(args []string) error {
+	cmd.UI.DisplayText(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -67,8 +70,6 @@ func (cmd ShareServiceCommand) Execute(args []string) error {
 		"SpaceName":           cmd.SpaceName,
 		"Username":            user.Name,
 	})
-
-	fmt.Println(cmd.SpaceName)
 
 	warnings, err := cmd.Actor.ShareServiceInstanceByOrganizationAndSpaceName(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedOrganization().GUID, cmd.SpaceName)
 	cmd.UI.DisplayWarnings(warnings)
